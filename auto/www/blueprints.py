@@ -32,7 +32,10 @@ def index():
 
 @routes.route('/dashboard', methods=['GET', 'POST'])
 def dashboard():
-    return render_template('dashboard.html', username=session['username'])
+    if 'username' in session:
+        return render_template('dashboard.html', username=session['username'])
+    else:
+        return render_template('login.html')
 
 
 @routes.route('/tree_demo')
@@ -45,7 +48,7 @@ def editor(project, suite, case):
     t = get_splitext(case)
 
     default = "default.html"
-    if t[1] in (".txt", ".robot"):
+    if t[1] in (".txt", ".robot", ".py", ".js"):
         default = "editor.html"
     elif t[1] in (".bmp", ".jpg", ".jpeg", ".png", ".gif"):
         default = "view_img.html"
@@ -56,6 +59,11 @@ def editor(project, suite, case):
 @routes.route("/task_list/<name>")
 def task_list(name):
     return render_template('task_list.html', project=name)
+
+
+@routes.route("/scheduler/")
+def scheduler():
+    return render_template('scheduler.html')
 
 
 @routes.route("/user/")

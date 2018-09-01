@@ -17,6 +17,7 @@ import os
 import codecs
 
 from utils.file import list_dir, mk_dirs, exists_path, rename_file, remove_dir, get_splitext
+from utils.resource import ICONS
 
 
 class Project(Resource):
@@ -194,12 +195,13 @@ def remove_project(app, username, name):
 
 
 def get_project_list(app, username):
-    user_path = app.config["AUTO_HOME"] + "/users/" + username
-    if os.path.exists(user_path):
-        config = json.load(codecs.open(user_path + '/config.json', 'r', 'utf-8'))
-        data = config['data']
+    work_path = app.config["AUTO_HOME"] + "/workspace/" + username
+    if os.path.exists(work_path):
+        projects = list_dir(work_path)
+        if len(projects) > 1:
+            projects.sort()
 
-        return data
+            return projects
 
     return []
 
@@ -259,14 +261,14 @@ def get_projects(app, username):
     children = []
     for p in projects:
         children.append({
-            "text": p["name"],
+            "text": p,
             "iconCls": "icon-project",
             "state": "closed",
             "attributes": {
-                "name": p["name"],
-                "description": p["description"],
+                "name": p,
+                # "description": p["description"],
                 "category": "project",
-                "boolean": p["boolean"]
+                # "boolean": p["boolean"]
             },
             "children": []
         })
@@ -316,12 +318,8 @@ def get_case_by_suite(app, username, args):
     children = []
     for t in cases:
         text = get_splitext(t)
-        if text[1] == ".robot":
-            icons = "icon-robot"
-        elif text[1] == ".txt":
-            icons = "icon-resource"
-        elif text[1] in (".bmp", ".jpg", ".jpeg", ".png", ".gif"):
-            icons = "icon-image"
+        if text[1] in ICONS:
+            icons = ICONS[text[1]]
         else:
             icons = "icon-file-default"
 
